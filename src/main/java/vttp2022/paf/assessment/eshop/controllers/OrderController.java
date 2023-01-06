@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +28,7 @@ import vttp2022.paf.assessment.eshop.respositories.OrderRepository;
 import vttp2022.paf.assessment.eshop.services.WarehouseService;
 
 @Controller
-@RequestMapping(produces=MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
 
 	//TODO: Task 3
@@ -88,8 +90,8 @@ public class OrderController {
 															.add("status", "dispatched").build();	
             return ResponseEntity.ok(response2.toString());   
 			} else{
-				JsonObject response2 = Json.createObjectBuilder().add("orderId", order.getOrderId())
-															     .add("status", "pending").build();	
+			JsonObject response2 = Json.createObjectBuilder().add("orderId", order.getOrderId())
+															 .add("status", "pending").build();	
             return ResponseEntity.ok(response2.toString());   
 			}
 			
@@ -101,6 +103,15 @@ public class OrderController {
                     .body("{error: save failed. Please try again.}");
 		}
 
+	}
+
+	@GetMapping(path="/api/order/{name}/status", consumes=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getOrders(@PathVariable String name) throws Exception {
+		Optional<MultiValueMap<String, Integer>> result = orderRepo.get(name);
+		return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.contentType(MediaType.APPLICATION_JSON)
+					.body("{error: save failed. Please try again.}");
 	}
 
 }

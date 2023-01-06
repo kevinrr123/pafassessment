@@ -2,10 +2,12 @@ package vttp2022.paf.assessment.eshop.services;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.json.Json;
@@ -17,6 +19,8 @@ import vttp2022.paf.assessment.eshop.models.Order;
 import vttp2022.paf.assessment.eshop.models.OrderStatus;
 
 public class WarehouseService {
+
+	private JdbcTemplate template;
 
 	// You cannot change the method's signature
 	// You may add one or more checked exceptions
@@ -54,10 +58,14 @@ public class WarehouseService {
 			status.setOrderId(jObj.getString("orderId"));
 			status.setDeliveryId(jObj.getString("deliveryId"));
 			status.setStatus("dispatched");
+			String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
+			template.update("insert into order_status(order_id, delivery_id, status, status_update) values(?,?,?,?)", order.getOrderId(),order.getDeliveryId(),status.getStatus(),timeStamp);
 			return status;
 		}catch(Exception ex){
 			status.setOrderId(order.getOrderId());
 			status.setStatus("pending");
+			String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
+			template.update("insert into order_status(order_id, delivery_id, status, status_update) values(?,?,?,?)", order.getOrderId(),order.getDeliveryId(),status.getStatus(),timeStamp);
 			return status;
 		}
 	}
